@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="container ">
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-white border-bottom border-radius p-3 bg-rosa shadow position-fixed top-0 start-50 translate-middle-x d-none d-md-block" style="z-index: 1050;">
+                    Productos
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 10px;"></div>
+
+    <!-- Botón Crear Producto solo admin -->
+    {% if user.is_staff %}
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'crear_producto' %}" class="btn btn-dark">Crear Producto</a>
+    </div>
+    {% endif %}
+
+    <div class="row">
+    {% for producto in productos %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm d-flex flex-column">
+                <!-- Imagen con enlace al modal -->
+                <a href="#" data-bs-toggle="modal" data-bs-target="#imagenModal{{ producto.id }}">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" class="card-img-top fixed-img" alt="{{ producto.nombre }}">
+                    {% else %}
+                        <div class="fixed-img placeholder-img"></div>
+                    {% endif %}
+                </a>
+
+                <div class="card-body d-flex flex-column justify-content-between min-body-height">
+                    <div>
+                        <h5 class="card-title ">{{ producto.nombre }}</h5>
+                        <div style="max-height: 80px; overflow-y: auto;">
+                            <p class="card-text text-muted">{{ producto.descripcion|default:"Sin descripción" }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="fw-bold" style="color: #cf518c !important;">
+                            ${{ producto.precio|floatformat:0|intcomma }}
+                        </p>
+
+                        {% if user.is_staff %}
+                            <p><span class="badge bg-primary">Existencias: {{ producto.stock }}</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones para admin -->
+                {% if user.is_staff and producto.id %}
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'editar_producto' producto.id %}" class="btn btn-sm btn-outline-dark">Editar</a>
+
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ producto.id }}">
+                        Eliminar
+                    </button>
+                </div>
+
+                <!-- Modal de confirmación de eliminación -->
+                <div class="modal fade" id="eliminarModal{{ producto.id }}" tabindex="-1" aria-labelledby="eliminarModalLabel{{ producto.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="eliminarModalLabel{{ producto.id }}">Eliminar Producto</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Estás seguro de que deseas eliminar <strong>{{ producto.nombre }}</strong>?
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post" action="{% url 'eliminar_producto' producto.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Botón WhatsApp para usuarios normales -->
+                {% if not user.is_staff and producto.id %}
+                <div class="card-footer">
+                    {% with mensaje="Hola Any, estoy interesado en el producto: "|add:producto.nombre|add:" - Me puedes dar más información? Aquí está el enlace: "|add:request.build_absolute_uri|add:producto.get_absolute_url %}
+                        <a href="https://wa.me/{{ admin_telefono|default:'573001234567' }}?text={{ mensaje|urlencode }}"
+                           class="btn btn-dark btn-sm w-100"
+                           target="_blank">
+                            Consultar por WhatsApp
+                        </a>
+
+                    {% endwith %}
+                </div>
+                {% endif %}
+
+                <!-- Modal de imagen -->
+                <div class="modal fade" id="imagenModal{{ producto.id }}" tabindex="-1" aria-labelledby="imagenModalLabel{{ producto.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+                        <div class="modal-content bg-transparent border-0 shadow-none position-relative">
+                            <div class="modal-body text-center p-0">
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen.url }}"
+                                        class="img-fluid rounded"
+                                        style="max-height: 60vh;"
+                                        alt="{{ producto.nombre }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/600x400"
+                                        class="img-fluid rounded"
+                                        style="max-height: 60vh;"
+                                        alt="Sin imagen">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center">No hay productos registrados.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

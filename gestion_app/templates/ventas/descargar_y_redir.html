@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Factura</title>
+</head>
+<body>
+<!-- Link invisible para descargar el PDF -->
+<a id="downloadLink" href="{% url 'descargar_factura' venta.id %}" download="factura_{{ venta.id }}.pdf" style="display:none;"></a>
+
+<script>
+    // Hacer click automático para iniciar la descarga
+    document.getElementById('downloadLink').click();
+
+    // Redirigir a la lista de clientes después de iniciar la descarga
+    window.location.href = "{% url 'crear_venta' %}";
+</script>
+</body>
+</html>

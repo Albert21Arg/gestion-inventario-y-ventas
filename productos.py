@@ -1,0 +1,118 @@
+from gestion_app.models import Producto
+
+productos = [
+    # Fragancias Mujer
+    {"nombre": "Perfume Confidently You MARY KAY", "descripcion": "Realza tu confianza natural y refleja tu verdadera esencia-Aroma Floral Oriental", "precio": 154900},
+    {"nombre": "Pink Diamonds®", "descripcion": "Te inspira a brillar con luz propia-Aroma Floral Blanca", "precio": 121500},
+    {"nombre": "Forever Diamonds®", "descripcion": "Refleja el lado más soñador, romántico y sentimental de una mujer-Aroma Floral Frutal", "precio": 121500},
+    {"nombre": "Love Fearlessly®", "descripcion": "Celebra el corazón amoroso y compasivo de una mujer-Aroma Floral Oriental", "precio": 95100},
+    {"nombre": "Moderm Charm Glam®", "descripcion": "Aroma sofisticado y poderoso que celebra todas tus facetas-Aroma Oriental Floral", "precio": 121500},
+    {"nombre": "Modern Charm®", "descripcion": "Inspirada en la mujer moderna, poderosa y memorable-Aroma Chipre Floral", "precio": 121500},
+    {"nombre": "If You Believe®", "descripcion": "Fascinante fragancia donde la magia es tangible y el misterio es eterno-Aroma Cítrico Amaderado", "precio": 116900},
+    {"nombre": "Wish®", "descripcion": "Inspirada en la mujer que cree que todo aquello que desea está a su alcance-Aroma Floral Frutal", "precio": 116900},
+    {"nombre": "True Passion L'Eau®", "descripcion": "Siente la libertad de expresar tus sentidos y alegría en cada momento de tu vida-Aroma Oriental Floral", "precio": 110500},
+    {"nombre": "True Passion®", "descripcion": "Frescura y sensualidad, que celebra su pasión por la vida y el amor.", "precio": 110500},
+    {"nombre": "Embrace® for Her", "descripcion": "Un aroma vibrante que celebra la alegría y la magia de las conexiones auténticas y significativas-Aroma Floral Frutal", "precio": 114900},
+    {"nombre": "Blush Scent®", "descripcion": "El arte de las capas de fragancias es simple-Aroma Chipre Floral", "precio": 96900},
+    {"nombre": "Garden Scent®", "descripcion": "El arte de las capas de fragancias es simple-Aroma Floral Frutal", "precio": 96900},
+    {"nombre": "Velvet Scent®", "descripcion": "El arte de las capas de fragancias es simple-Aroma Oriental Floral", "precio": 96900},
+    {"nombre": "Joy Emotion Scent®", "descripcion": "Descubre nuestra primera fragancia desarrollada para ayudar a evocar una sensación de alegría, felicidad y deleite-Aroma Frutal Floral", "precio": 99900},
+    {"nombre": "Hello Brilliant®", "descripcion": "Revela el brillo y la alegría de tu espíritu-Aroma Floral Frutal", "precio": 89900},
+    {"nombre": "At Play® Pink", "descripcion": "Experimentar y atreverme a vivir sin disculpas y sin límites-Aroma Chipre Oriental", "precio": 88900},
+
+    # Fragancias Hombre
+    {"nombre": "Perfume Authentic Hero®", "descripcion": "Captura la fuerza y la ternura de la masculinidad moderna-Aroma Fougère Amaderado", "precio": 119900},
+    {"nombre": "Perfume Authentic Hero® Style", "descripcion": "Destaca la personalidad del hombre moderno-Aroma Fougère Aromático", "precio": 119900},
+    {"nombre": "Perfume Authentic Hero® Bold", "descripcion": "Dedicada a los hombres audaces por definición-Aroma Amaderado Aromático", "precio": 89900},
+    {"nombre": "Perfume Upscale Gentleman®", "descripcion": "Su actitud es la de un hombre que es más que un caballero", "precio": 130900},
+    {"nombre": "Perfume Upscale® Black™", "descripcion": "La fuerza del hombre que lucha por lo que cree-Aroma Oriental Amaderado", "precio": 128900},
+    {"nombre": "Perfume Embrace® for Him", "descripcion": "Un aroma vibrante que celebra la alegría y la magia de las conexiones auténticas y significativas-Aroma Oriental Fougère", "precio": 114900},
+    {"nombre": "Perfume High Intensity® Sport™", "descripcion": "Inspira su lado más aventurero y estimula sus sentidos-Aroma Amaderado Cítrico", "precio": 139500},
+    {"nombre": "Perfume MK High Intensity® Ocean™", "descripcion": "El poder del océano en una fragancia-Aroma Cítrico Marino", "precio": 139500},
+    {"nombre": "Perfume Magnetic Passion®", "descripcion": "Una mezcla magnética y sensual para el hombre moderno-Aroma Amaderado", "precio": 139500},
+    {"nombre": "Perfume Magnetic Passion Edge®", "descripcion": "Inspirada en el hombre real, auténtico y visionario-Aroma Amaderado Oriental", "precio": 139500},
+
+    # Cuidado facial Hombre
+    {"nombre": "Gel Limpiador Facial MKMen®", "descripcion": "Limpia la piel a profundidad, reduce visiblemente el exceso de grasa y ayuda a preparar la piel para el afeitado.", "precio": 67400},
+    {"nombre": "Crema de Afeitar 2 en 1 MKMen®", "descripcion": "Combina comodidad con un acabado refrescante, ofreciendo un afeitado al ras y protegiendo contra los efectos de la afeitada.", "precio": 77500},
+    {"nombre": "Loción Facial Hidratante Intensiva MKMen®", "descripcion": "Aumenta la hidratación de la piel durante 12 horas. Incluye el antioxidante resveratrol y extracto de plancton.", "precio": 83500},
+
+    # Cuidado facial Mujer y TimeWise
+    {"nombre": "Loción Facial Restauradora de la Barrera de la Piel 1:1:3 Clinical Solutions®", "descripcion": "Actúa como un muro de ladrillos, mantiene los nutrientes esenciales y la humedad.", "precio": 129900},
+    {"nombre": "ACIDO FERULICO+NIACINAMIDA Para iluminar", "descripcion": "Reduce visiblemente las manchas oscuras con tres potentes ingredientes.", "precio": 89900},
+    {"nombre": "C+RESVERATROL Para Reduccion de Finas lineas", "descripcion": "Reduce los signos visibles del envejecimiento y minimiza las líneas de expresión.", "precio": 89900},
+    {"nombre": "PHA+AHA Para Exfoliar", "descripcion": "Ayuda a acelerar el proceso de renovación de la piel y disuelve gentilmente las células muertas.", "precio": 89900},
+    {"nombre": "HA+CERAMIDA ´Para la Humectacion", "descripcion": "Mejora y repone la humectación de la piel.", "precio": 89900},
+    {"nombre": "Crema Facial con Efecto Tensor de Líneas de Expresión Dinámicas", "descripcion": "Reduce la apariencia de las arrugas dinámicas causadas por las expresiones faciales.", "precio": 102900},
+    {"nombre": "Espuma Limpiadora Facial Volu-Firm™ TimeWise Repair®", "descripcion": "Limpia y mantiene la humectación de la piel.", "precio": 85900},
+    {"nombre": "Loción Facial Efecto Reafirmante Volu-Firm™ TimeWise Repair® de Fórmula Avanzada", "descripcion": "Ayuda a recuperar el triángulo de la juventud, dando mejillas llenas, mandíbula definida y piel del cuello más firme.", "precio": 147900},
+    {"nombre": "Crema Efecto Rellenador de Arrugas Volu-Fill™ TimeWise Repair®", "descripcion": "Ayuda a rellenar las líneas avanzadas de expresión y mejora la firmeza y uniformidad de la piel del rostro.", "precio": 109900},
+    {"nombre": "Crema Facial para el Día Efecto Reparador FPS 30 Volu-Firm™ TimeWise Repair®", "descripcion": "Minimiza líneas de expresión, restaura la firmeza, hidrata 12 horas y protege contra rayos UVA/UVB.", "precio": 147900},
+    {"nombre": "Crema Facial Nocturna Efecto Reparador con Retinol Volu-Firm™ TimeWise Repair®", "descripcion": "Contiene Retinol encapsulado que ayuda a mejorar los signos visibles del envejecimiento.", "precio": 147900},
+    {"nombre": "Crema de Acción Renovadora para el Contorno de los Ojos Volu-Firm™ TimeWise Repair®", "descripcion": "Minimiza la apariencia de las líneas de expresión alrededor de los ojos.", "precio": 106900},
+    {"nombre": "Limpiador Facial 4 en 1 TimeWise®", "descripcion": "Limpia, refresca, exfolia e ilumina.", "precio": 69900},
+    {"nombre": "Loción Facial Humectante con Antioxidantes TimeWise®", "descripcion": "Proporciona 12 horas de hidratación, ayuda a reducir líneas finas y mejora la firmeza de la piel.", "precio": 90900},
+    {"nombre": "Gel Facial de Recuperación Nocturna TimeWise®", "descripcion": "Suaviza líneas de expresión. Contiene extracto de flor de manzanilla y NutriBeads® con resveratrol.", "precio": 105900},
+    {"nombre": "Loción Facial Protectora de Día con FPS 30 TimeWise®", "descripcion": "Ayuda a retrasar los signos visibles del envejecimiento mientras reduce la apariencia de las líneas finas.", "precio": 84900},
+    {"nombre": "Crema para el Contorno de los Ojos TimeWise®", "descripcion": "Mejora líneas finas, opacidad, firmeza y textura.", "precio": 74000},
+    {"nombre": "Kit Combinación Ideal Avanzada TimeWise", "descripcion": "Incluye el cuidado de la delicada área de los ojos.", "precio": 361800},
+    {"nombre": "SET BÁSICO TIMEWISE", "descripcion": "Rutina de inicio para aquellos que recién comienzan su cuidado de la piel.", "precio": 160800},
+    {"nombre": "COMBINACIÓN IDEAL TIMEWISE", "descripcion": "Rutina esencial de 3 pasos, efectiva y fácil.", "precio": 327000},
+    {"nombre": "SET AM/PM TIMEWISE®", "descripcion": "Complemento ideal para potencializar resultados en día y noche.", "precio": 190800},
+    {"nombre": "Set Rutina Completa de Cuidado de la Piel Mary Kay®", "descripcion": "Cuatro simples pasos, para una piel ideal.", "precio": 177900},
+    {"nombre": "Limpiador Matificante Mary Kay®", "descripcion": "Remueve impurezas y exceso de grasa. Deja piel fresca y mate.", "precio": 44100},
+    {"nombre": "Exfoliante Facial Mary Kay®", "descripcion": "Elimina células muertas y limpia los poros, dejándola suave.", "precio": 44100},
+    {"nombre": "Tónico Balanceador Mary Kay®", "descripcion": "Contiene antioxidantes que ayudan a restaurar el equilibrio de la piel sin resecarla.", "precio": 42600},
+    {"nombre": "Crema Facial Matificante Mary Kay®", "descripcion": "Proporciona hidratación diaria y ayuda a matificar la piel grasa.", "precio": 47100},
+    {"nombre": "Loción Facial Regeneradora C + E TimeWise®", "descripcion": "Previene envejecimiento prematuro, aportando firmeza y luminosidad a la piel.", "precio": 124900},
+    {"nombre": "Agua Micelar Mary Kay®", "descripcion": "Limpieza delicada con micelas que eliminan maquillaje e impurezas.", "precio": 60900},
+    {"nombre": "Loción Desmaquillante de Ojos Libre de Aceite Mary Kay®", "descripcion": "Fórmula ligera de dos fases que limpia maquillaje resistente.", "precio": 69900},
+    {"nombre": "Loción Humectante Efecto Renovador Mary Kay®", "descripcion": "Hidrata, refresca y suaviza, minimizando la apariencia de poros.", "precio": 60900},
+    {"nombre": "Mascarilla Facial de Limpieza Profunda con Carbón Clear Proof® Mary Kay®", "descripcion": "Contiene carbón activado que elimina impurezas que obstruyen los poros.", "precio": 69900},
+    {"nombre": "Mascarilla Humectante en Gel Efecto Renovador TimeWise®", "descripcion": "Hidrata, retiene humedad, reafirma y suaviza para todo tipo de piel.", "precio": 65900},
+    {"nombre": "Aplicador de Silicona para Mascarillas Mary Kay®", "descripcion": "Brinda cobertura uniforme para evitar desperdicios.", "precio": 36900},
+    {"nombre": "Sistema para Microexfoliación Plus TimeWise®", "descripcion": "Reduce tamaño de poros y luce piel radiante en dos pasos.", "precio": 183300},
+    {"nombre": "Microexfoliante Refinador TimeWise®", "descripcion": "Exfoliante con cristales de óxido de aluminio que remueve células muertas.", "precio": 96500},
+    {"nombre": "Minimizador de Poros TimeWise®", "descripcion": "Suero ligero que minimiza aspecto de poros dilatados y mejora textura.", "precio": 96500},
+    {"nombre": "Parches de Hidrogel para Ojos Mary Kay®", "descripcion": "Luminosidad e hidratación intensa para ojos cansados.", "precio": 138900},
+    {"nombre": "Gel Refrescante para Párpados Mary Kay®", "descripcion": "Con extractos botánicos que relajan, tonifican y reafirman piel alrededor de los ojos.", "precio": 49900},
+    {"nombre": "Loción Reafirmante Corporal Targeted-Action® TimeWise®", "descripcion": "Proporciona beneficios visibles que tonifican el cuerpo, 24 horas de hidratación.", "precio": 93900},
+    {"nombre": "Protector Solar Facial Mineral FPS 30 Mary Kay® Protección Alta", "descripcion": "Protección 100% mineral contra rayos UVA y UVB, textura suave y ligera.", "precio": 91900},
+    {"nombre": "Protector Solar FPS 50+ Mary Kay® Protección Muy Alta", "descripcion": "Fórmula ligera de alta potencia, ideal para actividad al aire libre.", "precio": 124900},
+    {"nombre": "Gel para Ducha con aroma", "descripcion": "Refresca tu rutina de ducha con texturas cremosas y fragancias cálidas y afrutadas.", "precio": 49900},
+    {"nombre": "Loción Corporal con aroma", "descripcion": "Refresca tu rutina de ducha con texturas cremosas y fragancias cálidas y afrutadas.", "precio": 49900},
+
+    # Cuidado manos y labios
+    {"nombre": "Set para el Cuidado de las Manos Satin Hands®", "descripcion": "Mantiene juventud de manos, suaviza zonas secas.", "precio": 128900},
+    {"nombre": "Crema Protectora Restauradora para Manos Satin Hands® Libre de Fragancia", "descripcion": "Suaviza manos, sella humedad y prepara para exfoliación.", "precio": 46500},
+    {"nombre": "Crema Exfoliante Refinadora para Manos con Karité Satin Hands® White Tea & Citrus", "descripcion": "Exfolia delicadamente la piel de las manos.", "precio": 46500},
+    {"nombre": "HUMECTA Crema para Manos con Karité Satin Hands® White Tea & Citrus", "descripcion": "Hidratación instantánea hasta 24 horas.", "precio": 41900},
+    {"nombre": "Set Satin Lips®", "descripcion": "Manteca de karité para labios suaves.", "precio": 68200},
+    {"nombre": "Mascarilla Exfoliante para Labios con Karité Satin Lips®", "descripcion": "Exfolia suavemente los labios dejándolos suaves.", "precio": 37900},
+    {"nombre": "Crema Humectante para Labios con Karité Satin Lips®", "descripcion": "Nutre los labios y los deja humectados.", "precio": 37900},
+
+    # Maquillaje
+    {"nombre": "Mary Kay® Corrector Iluminador para Ojos", "descripcion": "Neutraliza ojeras y ayuda a iluminar área debajo de los ojos.", "precio": 50900},
+    {"nombre": "Corrector para Ojos Multi-Beneficios", "descripcion": "Cobertura completa con pocas gotas.", "precio": 50900},
+    {"nombre": "Base para Maquillaje FPS 15 Mary Kay®", "descripcion": "Gel ligero libre de aceite que prepara la piel y protege de rayos UVA/UVB.", "precio": 64500},
+    {"nombre": "CC Cream – Crema Correctora de Color con FPS 15 Mary Kay®", "descripcion": "Cobertura ligera para todo tipo de piel.", "precio": 72900},
+    {"nombre": "Base TimeWise 3D®", "descripcion": "Tecnología IntelliMatch® que se ajusta a cada tono de piel.", "precio": 71500},
+    {"nombre": "Brocha para Rubor Mary Kay", "descripcion": "Forma 3-en-1 para aplicar rubor, contornear e iluminar.", "precio": 47900},
+    {"nombre": "Perfect Palette™ Mary Kay®", "descripcion": "Personalízala con tu look preferido, incluye espejo.", "precio": 29500},
+    {"nombre": "Rubor Compacto Mary Kay® Chromafusion®", "descripcion": "Color puro y duradero con tecnología Chromafusion® Matrix.", "precio": 44900},
+    {"nombre": "Iluminador para Rostro Mary Kay® Chromafusion®", "descripcion": "Aporta luz al rostro, aplicándolo en frente, mentón, pómulos y nariz.", "precio": 44900},
+    {"nombre": "Labial Mary Kay®", "descripcion": "Acabado cremoso e intenso color de larga duración.", "precio": 39900},
+    {"nombre": "Labial Líquido Mary Kay®", "descripcion": "Fórmula cremosa, duradera y con acabado mate.", "precio": 46900},
+    {"nombre": "Delineador de Ojos Mary Kay®", "descripcion": "Fórmula suave y precisa, larga duración.", "precio": 38900},
+    {"nombre": "Máscara de Pestañas Mary Kay®", "descripcion": "Volumen y definición, efecto intensificador.", "precio": 59900},
+]
+
+for p in productos:
+    Producto.objects.get_or_create(
+        nombre=p["nombre"],
+        defaults={
+            "precio": p["precio"],
+            "descripcion": p["descripcion"],
+            "stock": 0
+        }
+    )

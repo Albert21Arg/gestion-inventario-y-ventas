@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<style>
+/* Lista de sugerencias */
+.list-group.position-absolute {
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: .5rem;
+  z-index: 2000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Cada elemento de la lista */
+.list-group-item {
+  font-size: 1rem;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Nombre del producto */
+.list-group-item .nombre {
+  flex: 1;
+  font-weight: 500;
+  color: #212529;
+}
+
+/* Precio del producto */
+.list-group-item .precio {
+  color: #198754;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Hover */
+.list-group-item:hover,
+.list-group-item:focus {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+/* Ajustes en pantallas pequeñas */
+@media (max-width: 768px) {
+  .list-group.position-absolute {
+    width: 100vw !important;
+    left: 0 !important;
+    right: 0 !important;
+    max-height: 45vh;
+  }
+  .list-group-item {
+    font-size: 1.1rem;
+    padding: 14px 18px;
+  }
+}
+</style>
+
+<div class="container-fluid mt-4 p-3 shadow-sm border-primary">
+  <div class="position-relative mb-3">
+    <h2 class="display-5 fw-bold text-white border-bottom border-radius p-3 bg-rosa shadow position-fixed top-0 start-50 translate-middle-x d-none d-md-block"
+        style="z-index:1050;">
+      Ventas
+    </h2>
+
+    <a href="{% url 'crear_cliente' %}"
+       class="btn btn-success position-absolute top-0 end-0 mt-2 me-2">
+      + Nuevo Cliente
+    </a>
+  </div>
+
+  <form id="form-venta" method="post" action="{% url 'crear_venta' %}" class="row g-3">
+    {% csrf_token %}
+
+    <!-- Cliente -->
+    <div class="col-12">
+      <label class="form-label fw-bold">Cliente:</label>
+      <div class="position-relative">
+        <input type="text" id="cliente-buscar" name="cliente_nombre"
+               class="form-control" placeholder="Escribe el nombre del cliente"
+               autocomplete="off" required>
+        <input type="hidden" name="cliente_id" id="cliente-id">
+        <div id="sugerencias-cliente"
+             class="list-group position-absolute w-100 shadow-sm"
+             style="z-index:2000;"></div>
+      </div>
+    </div>
+
+    <!-- Productos -->
+    <div class="table-responsive mb-3" style="max-height: 400px; min-height: 200px; overflow-y: auto;">
+      <table class="table table-bordered table-sm table-hover" id="tabla-productos">
+        <thead class="table-dark">
+          <tr>
+            <th style="min-width: 200px;">Producto</th>
+            <th style="width: 80px;">Cantidad</th>
+            <th style="width: 120px;">Precio</th>
+            <th style="width: 50px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Las filas se llenan dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Plantilla para nueva fila -->
+    <template id="fila-template">
+      <tr>
+        <td class="position-relative">
+          <input type="text" name="producto_nombre[]" class="form-control producto-buscar" placeholder="Escribe el producto" autocomplete="off" required>
+          <input type="hidden" name="producto_id[]" class="producto-id">
+          <div class="sugerencias-producto list-group position-absolute w-100" style="z-index:1000;"></div>
+        </td>
+        <td><input type="number" name="cantidad[]" class="form-control cantidad" min="1" value="1"></td>
+        <td>
+          <input type="number" name="precio[]" class="form-control precio-input" min="0" step="0.01" value="0">
+        </td>
+        <td><button type="button" class="btn btn-danger btn-sm eliminar">X</button></td>
+      </tr>
+    </template>
+
+    <!-- Botón agregar y total -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 gap-2">
+      <button type="button" id="agregar-fila" class="btn btn-success col-md-2 col-12 w-md-auto">+ Agregar producto</button>
+      <h4 class="text-center text-md-end w-100 w-md-auto">Total: $<span id="total">0</span></h4>
+    </div>
+
+    <!-- Estado de compra -->
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary">Estado de compra</h5>
+          <div class="mb-3">
+            <label for="abono" class="form-label fw-bold">Abono</label>
+            <input type="text" name="abono" id="abono" class="form-control" value="0">
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="pago_completo" name="pago_completo">
+            <label class="form-check-label fw-bold text-success" for="pago_completo">Pago completo</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones finales -->
+    <div class="col-12 d-flex flex-column flex-md-row gap-2 mt-3">
+      <button type="submit" class="btn btn-primary w-100 w-md-auto">Guardar Venta</button>
+      <a href="{% url 'cliente_list' %}" class="btn btn-secondary w-100 w-md-auto">Volver a Clientes</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const abonoInput = document.getElementById("abono");
+  const pagoCompletoInput = document.getElementById("pago_completo");
+  const formatearCOP = v => new Intl.NumberFormat("es-CO").format(Number(v) || 0);
+
+  function recalcular() {
+    let total = 0;
+    document.querySelectorAll("#tabla-productos tbody tr").forEach(row => {
+      const cant = parseInt(row.querySelector(".cantidad").value) || 0;
+      const precio = parseFloat(row.querySelector(".precio-input").value) || 0;
+      total += cant * precio;
+    });
+    document.getElementById("total").textContent = formatearCOP(total);
+    if (pagoCompletoInput.checked) abonoInput.value = formatearCOP(total);
+    return total;
+  }
+
+  // Agregar fila
+  document.getElementById("agregar-fila").addEventListener("click", () => {
+    document.querySelector("#tabla-productos tbody").appendChild(tmpl);
+    setTimeout(recalcular, 0);
+  });
+
+  // Eliminar fila
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("eliminar")) {
+      e.target.closest("tr").remove();
+      recalcular();
+    }
+  });
+
+  // Cambio de cantidad
+  document.addEventListener("input", e => {
+    if (e.target.classList.contains("cantidad")) {
+      if (+e.target.value < 1) e.target.value = 1;
+      recalcular();
+    }
+  });
+
+  // Cambio de precio manual
+  document.addEventListener("input", e => {
+    if (e.target.classList.contains("precio-input")) {
+      if (+e.target.value < 0) e.target.value = 0;
+      recalcular();
+    }
+  });
+
+  // Pago completo
+  pagoCompletoInput.addEventListener("change", e => {
+    recalcular();
+    if (!e.target.checked) abonoInput.value = "0";
+  });
+
+  // Autocomplete Cliente
+  (() => {
+    const input = document.getElementById("cliente-buscar"),
+          hidden = document.getElementById("cliente-id"),
+          sug = document.getElementById("sugerencias-cliente");
+    input.addEventListener("input", () => {
+      const q = input.value.trim();
+      if (!q) { sug.innerHTML = ""; hidden.value = ""; return; }
+      fetch("{% url 'buscar_cliente' %}?q=" + encodeURIComponent(q))
+      .then(r => r.json()).then(data => {
+        sug.innerHTML = "";
+        const regex = new RegExp(q, "gi");
+        data.forEach(c => {
+          const a = document.createElement("a");
+          a.href = "#";
+          a.className = "list-group-item list-group-item-action";
+          a.innerHTML = `<span class="nombre">${c.nombre.replace(regex, match => `<strong>${match}</strong>`)}</span>`;
+          a.onclick = ev => {
+            ev.preventDefault();
+            input.value = c.nombre;
+            hidden.value = c.id;
+            sug.innerHTML = "";
+          };
+          sug.appendChild(a);
+        });
+      });
+    });
+    document.addEventListener("click", e => {
+      if (!sug.contains(e.target) && e.target !== input) sug.innerHTML = "";
+    });
+  })();
+
+  // Autocomplete Producto
+  document.addEventListener("input", e => {
+    if (!e.target.classList.contains("producto-buscar")) return;
+    const input = e.target,
+          hidden = input.closest("td").querySelector(".producto-id"),
+          sug = input.closest("td").querySelector(".sugerencias-producto"),
+          q = input.value.trim();
+    if (!q) {
+      sug.innerHTML = "";
+      hidden.value = "";
+      input.closest("tr").querySelector(".precio-input").value = 0;
+      recalcular();
+      return;
+    }
+    fetch("{% url 'buscar_producto' %}?q=" + encodeURIComponent(q))
+    .then(r => r.json()).then(data => {
+      sug.innerHTML = "";
+      const regex = new RegExp(q, "gi");
+      data.forEach(p => {
+        const a = document.createElement("a");
+        a.href = "#";
+        a.className = "list-group-item list-group-item-action";
+        a.innerHTML = `
+          <span class="nombre">${p.nombre.replace(regex, match => `<strong>${match}</strong>`)}</span>
+          <span class="precio">$${formatearCOP(p.precio)}</span>`;
+        a.onclick = ev => {
+          ev.preventDefault();
+          input.value = p.nombre;
+          hidden.value = p.id;
+          const tr = input.closest("tr");
+          tr.querySelector(".precio-input").value = p.precio;
+          sug.innerHTML = "";
+          recalcular();
+        };
+        sug.appendChild(a);
+      });
+    });
+  });
+
+  recalcular();
+});
+</script>
+{% endblock %}

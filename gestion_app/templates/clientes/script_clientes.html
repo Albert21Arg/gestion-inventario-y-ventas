@@ -1,0 +1,32 @@
+{% endblock script_cliente %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modales = document.querySelectorAll('.modal');
+
+    modales.forEach(modal => {
+        const botonesFiltro = modal.querySelectorAll('.filtro-venta');
+        const accordionItems = modal.querySelectorAll('.accordion-item');
+
+        function filtrarVentas(estado) {
+            accordionItems.forEach(item => {
+                if (estado === 'todos' || item.dataset.estado === estado) {
+                    item.classList.remove('d-none');
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            botonesFiltro.forEach(b => b.classList.remove('active'));
+            const btnActivo = modal.querySelector(`.filtro-venta[data-estado="${estado}"]`);
+            if (btnActivo) btnActivo.classList.add('active');
+        }
+
+        filtrarVentas('todos');
+
+        botonesFiltro.forEach(btn => {
+            btn.addEventListener('click', () => filtrarVentas(btn.dataset.estado));
+        });
+    });
+});
+</script>
+{% endblock %}

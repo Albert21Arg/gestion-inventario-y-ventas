@@ -1,0 +1,129 @@
+.factura {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    position: relative;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(200, 200, 200, 0.1),
+        rgba(200, 200, 200, 0.1) 1px,
+        transparent 1px,
+        transparent 50px
+    );
+}
+
+/* Alternativa con texto repetido diagonal */
+.factura::before {
+    content: "Leidy Aristizabal";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 60px;
+    color: rgba(200, 200, 200, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: center;
+    pointer-events: none;
+    z-index: -1;
+    transform: rotate(-30deg);
+}
+
+.fixed-img {
+    height: 200px;          /* altura fija en tarjeta */
+    width: 100%;
+    object-fit: cover;      /* rellena toda la tarjeta */
+    cursor: pointer;
+  }
+
+  .modal-img {
+    max-height: 90vh;       /* ocupa hasta el 90% de la altura de la ventana */
+    max-width: 100%;        /* nunca sobrepasa el ancho */
+    object-fit: contain;    /* se adapta sin recortar */
+    border-radius: 10px;
+  }
+
+.modal-backdrop.show {
+    background-color: rgba(0, 0, 0, 1) !important; /* más oscuro */
+  }
+
+  @media (max-width: 768px) {
+    table thead {
+        display: none;
+    }
+    table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background: #fff;
+    }
+    table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 10px;
+        border: none !important;
+    }
+    table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #333;
+    }
+}
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Campos siempre al 100% ancho en su contenedor */
+.card-body .form-control,
+.card-body .form-select,
+.card-body textarea {
+    width: 100%;
+    height: 38px;
+    padding: 0.35rem 0.5rem;
+}
+
+/* Textarea más pequeño y compacto */
+.card-body textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Ajuste de la card en móviles */
+@media (max-width: 576px) {
+    .card {
+        margin: 10px;
+        width: auto !important;
+    }
+}
+
+.bg-rosa {
+  background-color: #cf518c !important; /* color rosa claro */
+  color: #000;
+}
+
+.fw-bold.text-rosa {
+    color: #cf518c !important;
+}
+
+.navbar {
+  backdrop-filter: blur(6px);
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ffeaea !important;
+  transform: translateY(-2px);
+}

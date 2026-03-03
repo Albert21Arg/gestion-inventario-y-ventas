@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-2 px-md-4">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+
+        <!-- TÍTULO -->
+        <h2 class="display-5 fw-bold text-white border-bottom border-radius p-3 bg-rosa shadow-sm position-fixed top-0 start-50 translate-middle-x d-none d-md-block"
+            style="z-index:1050; width:fit-content;">
+            Clientes
+        </h2>
+
+        <!-- ACCIONES / BADGE -->
+        {% if request.user.is_superuser %}
+            <!-- Botones solo para superusuario (ocultos en móviles) -->
+            <div class="d-none d-md-flex flex-row justify-content-end gap-2 ms-auto">
+                <a href="{% url 'crear_cliente' %}" class="btn btn-outline-success shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Crear Cliente
+                </a>
+                <a href="{% url 'exportar_clientes_excel' %}" class="btn btn-outline-primary shadow-sm">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+                </a>
+            </div>
+
+        {% else %}
+            <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm ms-auto">
+                ✔ Sin Deuda
+            </span>
+        {% endif %}
+    </div>
+
+    <div style="margin-top:5px;"></div>
+
+    <!-- TABLA DE CLIENTES -->
+    <!-- BOTONES DE FILTRO -->
+                <div class="d-flex gap-2 mb-3">
+                    <button id="btnMostrarTodos" class="btn btn-outline-dark btn-sm active">
+                        <i class="bi bi-people-fill me-1"></i> Todos
+                    </button>
+                    <button id="btnMostrarDeudores" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-cash-stack me-1"></i> Solo Deudores
+                    </button>
+                </div>
+    <div class="table-responsive shadow-sm rounded" style="max-height:60vh; overflow-y:auto;">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1020;">
+
+                <tr>
+                    <th>Nombre</th>
+                    <th>Última Venta</th>
+                    <th class="text-center">Estado</th>
+                    <th>Celular</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <!-- Nombre -->
+                    <td class="fw-semibold">{{ cliente.nombre }}</td>
+
+                    <!-- Última venta -->
+                    <td>
+                        {% if cliente.ultima_venta %}
+                            {{ cliente.ultima_venta|date:"j M Y" }}
+                        {% else %}
+                            <span class="text-muted">Sin ventas</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Estado de deuda -->
+                    <td class="align-middle">
+                        {% if cliente.total_deuda > 0 %}
+                        <div class="p-2 rounded border bg-light shadow-sm text-center">
+                            <span class="fw-semibold text-danger d-block mb-1">
+                                💰 Debe: <span class="fw-bold">${{ cliente.total_deuda|floatformat:0|intcomma }}</span>
+                            </span>
+                            <a class="btn btn-sm btn-dark w-100"
+                               href="https://wa.me/{{ cliente.celular|slice:'1:' }}?text=Hola,%20{{ cliente.primer_nombre }}.%20Tienes%20una%20deuda%20pendiente%20de%20${{ cliente.total_deuda|floatformat:0|intcomma }}.%20Puedes%20abonar%20si%20lo%20prefieres."
+                               target="_blank">
+                                <i class="bi bi-whatsapp me-1"></i> Recordar por WhatsApp
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Celular -->
+                    <td>
+                        <a href="https://wa.me/{{ cliente.celular|slice:'1:' }}?text={{ '¡Hola! Queríamos saber cómo te va con los productos. ¿Todo bien?'|urlencode }}"
+                           class="text-success text-decoration-none" target="_blank">
+                            <i class="bi bi-whatsapp me-1"></i>{{ cliente.celular }}
+                        </a>
+                    </td>
+
+                    <!-- Tipo -->
+                    <td>
+                        {% if cliente.tipo == 'regular' %}
+                            <span class="badge bg-secondary">REGULAR</span>
+                        {% elif cliente.tipo == 'frecuente' %}
+                            <span class="badge bg-warning text-dark">FRECUENTE</span>
+                        {% elif cliente.tipo == 'vip' %}
+                            <span class="badge bg-success">VIP</span>
+                        {% else %}
+                            <span class="badge bg-info">{{ cliente.tipo|upper }}</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Acciones -->
+                    <td>
+                        {% if request.user.is_superuser %}
+                        <button class="btn btn-sm btn-outline-primary mb-1" data-bs-toggle="modal"
+                                data-bs-target="#verCliente{{ cliente.id }}">
+                            <i class="bi bi-eye"></i> Ver
+                        </button>
+                        <a href="{% url 'editar_cliente' cliente.id %}" class="btn btn-sm btn-outline-dark mb-1">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                        {% else %}
+                        <span class="text-muted">Sin acciones</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No hay clientes registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+        <!-- RESUMEN DE TOTALES -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 my-3">
+                <div class="card shadow-sm border-0" >
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold text-danger mb-1">💰 Total Deuda</h6>
+                        <h4 class="fw-bold text-danger mb-0">${{ total_deuda|floatformat:0|intcomma }}</h4>
+                    </div>
+                </div>
+                <div class="card shadow-sm border-0" >
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold text-success mb-1">✅ Total Pagado</h6>
+                        <h4 class="fw-bold text-success mb-0">${{ total_pagado|floatformat:0|intcomma }}</h4>
+                    </div>
+                </div>
+
+            </div>
+</div>
+
+<!-- MODALES DE CLIENTES -->
+{% for cliente in clientes %}
+<div class="modal fade" id="verCliente{{ cliente.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">{{ cliente.nombre }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p><strong>Documento:</strong> {{ cliente.documento|default:"No registrado" }}</p>
+                <p><strong>Correo:</strong> {{ cliente.correo|default:"-" }}</p>
+
+                <!-- Notas -->
+                <p><strong>Notas:</strong></p>
+                <div class="p-2 border rounded bg-light mb-3" style="max-height:100px; overflow-y:auto;">
+                    {{ cliente.notas|default:"-"|linebreaksbr|safe }}
+                </div>
+
+                <!-- HISTORIAL DE COMPRAS -->
+                <h6 class="fw-bold border-bottom pb-1">Historial de Compras</h6>
+
+                <div class="mb-2 d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-success filtro-venta" data-estado="completo">✔ Pago Completado</button>
+                    <button class="btn btn-sm btn-warning filtro-venta" data-estado="pendiente">⚠ Pago Pendiente</button>
+                    <button class="btn btn-sm btn-outline-secondary filtro-venta" data-estado="todos">Todos</button>
+                </div>
+
+                <div class="accordion" id="accordion{{ cliente.id }}" style="max-height:300px; overflow-y:auto;">
+                    {% for venta in cliente.ventas.all|dictsortreversed:"fecha" %}
+                    <div class="accordion-item" data-estado="{% if venta.pago_completo %}completo{% else %}pendiente{% endif %}">
+                        <h2 class="accordion-header" id="heading{{ venta.id }}">
+                            <button class="accordion-button collapsed {% if venta.pago_completo %}bg-success text-white{% elif venta.restante > 0 %}bg-warning{% endif %}"
+                                    type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse{{ venta.id }}">
+                                <strong>{{ venta.codigo }}</strong> | {{ venta.fecha|date:"d/m/Y H:i" }} |
+                                Total: ${{ venta.total|floatformat:0|intcomma }}
+                            </button>
+                        </h2>
+
+                        <div id="collapse{{ venta.id }}" class="accordion-collapse collapse">
+                            <div class="accordion-body p-2">
+                                <ul class="list-group list-group-flush">
+                                    {% for detalle in venta.detalles.all %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center p-1">
+                                        {{ detalle.producto.nombre }} (x{{ detalle.cantidad }})
+                                        <span class="fw-bold text-success">
+                                            ${{ detalle.subtotal|floatformat:0|intcomma }}
+                                        </span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+
+                                {% if request.user.is_superuser %}
+                                <form method="post" action="{% url 'actualizar_venta' venta.id %}" class="mt-2 d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="number" name="abono" value="{{ venta.abono }}" class="form-control form-control-sm" style="max-width:150px;">
+                                    <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
+                                </form>
+                                {% endif %}
+
+                                <div class="mt-2 text-end">
+                                    <span class="badge bg-primary">Total: ${{ venta.total|floatformat:0|intcomma }}</span>
+                                    {% if venta.abono > 0 %}
+                                    <span class="badge bg-warning text-dark">Abono: ${{ venta.abono|floatformat:0|intcomma }}</span>
+                                    {% endif %}
+                                    <span class="badge bg-danger">Restante: ${{ venta.restante|floatformat:0|intcomma }}</span>
+                                    {% if venta.pago_completo %}
+                                    <span class="badge bg-success">✔ Pago Completado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if not cliente.ventas.exists %}
+                <p class="text-muted mt-2">Este cliente aún no tiene compras registradas.</p>
+                {% endif %}
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.modal').forEach(modal => {
+        const filtros = modal.querySelectorAll('.filtro-venta');
+        const items = modal.querySelectorAll('.accordion-item');
+
+        function filtrar(estado) {
+            items.forEach(item => {
+                if (estado === 'todos' || item.dataset.estado === estado) {
+                    item.classList.remove('d-none');
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            filtros.forEach(f => f.classList.remove('active'));
+            const activo = modal.querySelector(`.filtro-venta[data-estado="${estado}"]`);
+            if (activo) activo.classList.add('active');
+        }
+
+        filtrar('todos');
+        filtros.forEach(b => b.addEventListener('click', () => filtrar(b.dataset.estado)));
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const btnTodos = document.getElementById("btnMostrarTodos");
+    const btnDeudores = document.getElementById("btnMostrarDeudores");
+    const filas = document.querySelectorAll("tbody tr");
+
+    btnTodos.addEventListener("click", function() {
+        btnTodos.classList.add("active");
+        btnDeudores.classList.remove("active");
+        filas.forEach(fila => fila.style.display = "");
+    });
+
+    btnDeudores.addEventListener("click", function() {
+        btnDeudores.classList.add("active");
+        btnTodos.classList.remove("active");
+
+        filas.forEach(fila => {
+            const deuda = fila.querySelector(".text-danger");
+            if (deuda) {
+                fila.style.display = "";
+            } else {
+                fila.style.display = "none";
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

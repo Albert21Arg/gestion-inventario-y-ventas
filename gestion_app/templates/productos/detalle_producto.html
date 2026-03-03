@@ -1,0 +1,71 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ producto.nombre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .producto-img {
+            max-height: 400px;
+            object-fit: contain;
+            border: 1px solid #e0e0e0;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <a href="{% url 'listado_productos' %}" class="btn btn-outline-secondary mb-4">&larr; Volver al listado</a>
+
+    <div class="row">
+        <!-- Imagen del producto -->
+        <div class="col-md-6 text-center mb-4 mb-md-0">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid producto-img">
+            {% else %}
+                <img src="https://via.placeholder.com/400x300?text=Sin+imagen" alt="Sin imagen" class="img-fluid producto-img">
+            {% endif %}
+        </div>
+
+        <!-- Detalles del producto -->
+        <div class="col-md-6">
+            <h2 class="mb-3">{{ producto.nombre }}</h2>
+
+            <h4 class="text-success fw-bold mb-3">
+                ${{ producto.precio|floatformat:0|intcomma }}
+            </h4>
+
+            {% if user.is_staff %}
+                <p><span class="badge bg-primary">Stock: {{ producto.stock }}</span></p>
+            {% endif %}
+
+            <hr>
+
+            <h5>Descripción</h5>
+            <p class="text-muted">
+                {{ producto.descripcion|default:"Este producto no tiene descripción." }}
+            </p>
+
+            <!-- Botón WhatsApp (para usuarios normales) -->
+            {% if not user.is_staff %}
+                    {% with mensaje="Hola, estoy interesado en el producto: "|add:producto.nombre|add:" - Me puedes dar más información? Aquí está el enlace: "|add:request.build_absolute_uri|add:producto.get_absolute_url %}
+
+
+                    {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Bootstrap Icons (opcional para ícono WhatsApp) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+</body>
+</html>
