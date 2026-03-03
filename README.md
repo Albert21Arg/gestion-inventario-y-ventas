@@ -81,7 +81,7 @@ En una fase futura, se planea habilitar un **portal de clientes** donde estos po
 ### 🔹 Pasos de instalación
 ```bash
 # Clonar repositorio
-git clone https://github.com/tuusuario/gestion-clientes-productos.git
+git clone https://github.com/Albert21Arg/gestion-inventario-y-ventas.git
 cd gestion-clientes-productos
 
 # Crear entorno virtual
